@@ -4,6 +4,7 @@ const watch = require('mutant/watch')
 const Value = require('mutant/value')
 const assert = require('assert')
 const Defer = require('pull-defer').source
+const { name } = require('./package.json')
 
 // auto-inject the ssb-server to all methods to reduce repitition
 module.exports = function inject (server, methods, pluginDeps = []) {
@@ -18,7 +19,7 @@ module.exports = function inject (server, methods, pluginDeps = []) {
       return injectObsServer(server, methods)
 
     default:
-      throw new Error('scuttle-poll expects an ssb server (or obs that contains one)')
+      throw new Error(`${name} requires a scuttlebot server (or obs that contains one)`)
   }
 }
 
@@ -76,6 +77,6 @@ function checkMethods (methods) {
 
 function checkPlugins (server, pluginDeps) {
   pluginDeps.forEach(p => {
-    if (!server[p]) throw new Error(`scuttle-blog needs a scuttlebot server with the ${p} plugin installed`)
+    if (!server[p]) throw new Error(`${name} requires a scuttlebot server with the ${p} plugin installed`)
   })
 }
