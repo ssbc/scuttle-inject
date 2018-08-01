@@ -66,18 +66,18 @@ function injectObsServer (server, methods, pluginDeps = []) {
   })
 }
 
-function checkMethods (methods) {
-  const server = { backlinks: 'fake' }
+function checkMethods (methods, pluginDeps) {
+  const fakeServer = pluginDeps.reduce((obj, p) => { obj[p] = "fake"; return obj }, {})
   each(methods, (fn, path) => {
     assert(typeof fn === 'function', `${path.join('.')}: expect each method to be a function`)
-    const injectedMethod = fn(server)
+    const injectedMethod = fn(fakeServer)
     assert(typeof injectedMethod === 'function', `${path.join('.')}: expect each method to be a closure which accepts a server and returns a function`)
   })
 }
 
 function checkPlugins (server, pluginDeps) {
-  if (server.backlinks === "fake") return
   pluginDeps.forEach(p => {
+    if (server[p] === "fake") { return }
     if (!server[p]) throw new Error(`${name} requires a scuttlebot server with the ${p} plugin installed`)
   })
 }
