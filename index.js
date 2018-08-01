@@ -8,7 +8,7 @@ const { name } = require('./package.json')
 
 // auto-inject the ssb-server to all methods to reduce repitition
 module.exports = function inject (server, methods, pluginDeps = []) {
-  checkMethods(methods)
+  checkMethods(methods, pluginDeps)
 
   switch (typeof server) {
     case 'object': // just a classic ssb server
@@ -67,7 +67,7 @@ function injectObsServer (server, methods, pluginDeps = []) {
 }
 
 function checkMethods (methods, pluginDeps) {
-  const fakeServer = pluginDeps.reduce((obj, p) => { obj[p] = "fake"; return obj }, {})
+  const fakeServer = pluginDeps.reduce((obj, p) => Object.assign(obj, { [p]: 'fake' }), {})
   each(methods, (fn, path) => {
     assert(typeof fn === 'function', `${path.join('.')}: expect each method to be a function`)
     const injectedMethod = fn(fakeServer)
