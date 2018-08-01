@@ -76,6 +76,7 @@ function checkMethods (methods) {
 }
 
 function checkPlugins (server, pluginDeps) {
+  if (server.backlinks === "fake") return
   pluginDeps.forEach(p => {
     if (!server[p]) throw new Error(`${name} requires a scuttlebot server with the ${p} plugin installed`)
   })
