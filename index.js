@@ -8,7 +8,7 @@ const { name } = require('./package.json')
 
 // auto-inject the ssb-server to all methods to reduce repitition
 module.exports = function inject (server, methods, pluginDeps = []) {
-  checkMethods(methods)
+  checkMethods(methods, pluginDeps)
 
   switch (typeof server) {
     case 'object': // just a classic ssb server
@@ -66,17 +66,18 @@ function injectObsServer (server, methods, pluginDeps = []) {
   })
 }
 
-function checkMethods (methods) {
-  const server = { backlinks: 'fake' }
+function checkMethods (methods, pluginDeps) {
+  const fakeServer = pluginDeps.reduce((obj, p) => Object.assign(obj, { [p]: 'fake' }), {})
   each(methods, (fn, path) => {
     assert(typeof fn === 'function', `${path.join('.')}: expect each method to be a function`)
-    const injectedMethod = fn(server)
+    const injectedMethod = fn(fakeServer)
     assert(typeof injectedMethod === 'function', `${path.join('.')}: expect each method to be a closure which accepts a server and returns a function`)
   })
 }
 
 function checkPlugins (server, pluginDeps) {
   pluginDeps.forEach(p => {
+    if (server[p] === "fake") { return }
     if (!server[p]) throw new Error(`${name} requires a scuttlebot server with the ${p} plugin installed`)
   })
 }
